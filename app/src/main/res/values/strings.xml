@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MOSIS</string>
+    <string name="login_button">Uloguj se</string>
+    <string name="signup_button">Registruj se</string>
 </resources>

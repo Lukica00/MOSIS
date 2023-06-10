@@ -1,4 +1,4 @@
-package com.example.mosis
+package com.luka.mosis
 
 import org.junit.Test
 

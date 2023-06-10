@@ -1,4 +1,4 @@
-package com.example.mosis
+package com.luka.mosis
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
