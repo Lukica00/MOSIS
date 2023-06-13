@@ -4,28 +4,28 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.luka.mosis.databinding.FragmentLoginBinding
 
 class LoginFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = LoginFragment()
-    }
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var auth: FirebaseAuth
-    private val user: User by viewModels();
+    private val user: User by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -35,48 +35,62 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        Log.d("GA",binding.toString());
+        return binding.root
     }
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
 
         user.user = auth.currentUser
         if (user.user != null) {
+            Log.d("GA","DEBIL")
             findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         }
-        val login_button = view?.findViewById<Button>(R.id.login_button)
-        login_button?.isEnabled = false;
-        val signup_button = view?.findViewById<Button>(R.id.signup_button)
-        val email = view?.findViewById<EditText>(R.id.login_email_edittext)
-        var validEmail = !TextUtils.isEmpty(email?.text) && Patterns.EMAIL_ADDRESS.matcher(email?.text).matches();
-        val password = view?.findViewById<EditText>(R.id.login_password_edittext)
-        var validPassword = false;
-        if(!password?.text.isNullOrEmpty())
-            validPassword = password?.text!!.length > 5;
-        email?.doOnTextChanged { text, start, before, count ->
-            validEmail = !TextUtils.isEmpty(text) && Patterns.EMAIL_ADDRESS.matcher(text).matches();
-            login_button?.isEnabled = validPassword && validEmail;
+        Log.d("GA","govno")
+        val loginButton = binding.loginButton
+        loginButton.isEnabled = false
+        val signupButton = binding.signupButton
+        val email = binding.loginEmailEdittext
+        var validEmail = !TextUtils.isEmpty(email.text) && Patterns.EMAIL_ADDRESS.matcher(email.text).matches()
+        val password = binding.loginPasswordEdittext
+        var validPassword = false
+        if(!password.text.isNullOrEmpty())
+            validPassword = password.text!!.length > 5
+        email.doOnTextChanged { text, _, _, _ ->
+            validEmail = !TextUtils.isEmpty(text) && Patterns.EMAIL_ADDRESS.matcher(text!!).matches()
+            loginButton.isEnabled = validPassword && validEmail
         }
-        password?.doOnTextChanged { text, start, before, count ->
+        password.doOnTextChanged { text, _, _, _ ->
             if(!text.isNullOrEmpty())
-                validPassword = text.length > 5;
-            login_button?.isEnabled = validPassword && validEmail;
+                validPassword = text.length > 5
+            loginButton.isEnabled = validPassword && validEmail
         }
-        login_button?.isEnabled = validPassword && validEmail;
-        login_button?.setOnClickListener {
-            auth.signInWithEmailAndPassword(email?.text.toString(), password?.text.toString())
+        loginButton.isEnabled = validPassword && validEmail
+        loginButton.setOnClickListener {
+            auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
+                        Log.d("GA","KRETEN")
                         findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
-                        val user = auth.currentUser
                     } else {
                         Log.w("TAG", "signInWithEmail:failure", task.exception)
-                        Toast.makeText(this.context, "Vudju lav or vudju lajk", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this.context, "Vudju lav or vudju lajk", Toast.LENGTH_LONG).show()
                     }
                 }
         }
-        signup_button?.setOnClickListener {
+        signupButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
+    }
+/*    fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = inflater
+        inflater.inflate(R.menu.menu, menu)
+        return true
+    }*/
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
