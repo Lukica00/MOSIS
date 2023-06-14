@@ -21,4 +21,5 @@
     <string name="register_username">Username</string>
     <string name="login_email_edittext">Email</string>
     <string name="login_password">Password</string>
+    <string name="logout_item">Izloguj se</string>
 </resources>
