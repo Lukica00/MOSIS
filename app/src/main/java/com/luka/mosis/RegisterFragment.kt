@@ -1,8 +1,11 @@
 package com.luka.mosis
 
+import android.app.Activity
 import android.content.Intent
+import android.icu.text.DateFormat.getDateTimeInstance
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
@@ -10,16 +13,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
@@ -29,7 +31,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.luka.mosis.databinding.FragmentRegisterBinding
 import java.io.File
-import java.net.URI
+import java.util.Date
 
 
 class RegisterFragment : Fragment() {
@@ -39,9 +41,10 @@ class RegisterFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: StorageReference
-    private val user: User by viewModels()
-    private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
+    private val user: User by activityViewModels()
+    private lateinit var pickMedia: ActivityResultLauncher<Intent>
     private var imageUri: Uri? = null
+    private var imageUriTemp: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -55,14 +58,23 @@ class RegisterFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         binding.toolbar.setupWithNavController(findNavController())
-        pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            if (uri != null) {
-                imageUri = uri
-                binding.registerImage.setImageURI(uri)
-                Log.d("PhotoPicker", "Selected URI: $uri")
-            } else {
-                Log.d("PhotoPicker", "No media selected")
+        pickMedia = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    if(result.data!=null && result.data!!.data !=null){
+                        imageUri = result.data!!.data as Uri
+                        binding.registerImage.setImageURI(imageUri)
+                    }else{
+                        imageUri = imageUriTemp
+                        binding.registerImage.setImageURI(imageUriTemp)
+                    }
+                    Log.d("PhotoPicker", "Selected URI: $imageUri")
+                }
+                else -> {
+                    Log.d("PhotoPicker", "Otkazano")
+                }
             }
+
         }
         return binding.root
     }
@@ -104,12 +116,28 @@ class RegisterFragment : Fragment() {
         registerButton.isEnabled = validPassword && validEmail && validPhone && !username.text.isNullOrEmpty()
 
         image.setOnClickListener {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            val galleryintent = Intent(Intent.ACTION_GET_CONTENT, null)
+            galleryintent.type = "image/*"
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val path = File(requireActivity().filesDir, "Pictures")
+            if (!path.exists()) path.mkdirs()
+            val imagege = File(path, "Slika_${
+                getDateTimeInstance().format(Date())
+            }.jpg")
+
+            imageUriTemp = FileProvider.getUriForFile(requireActivity(), "com.luka.mosis.fileprovider", imagege)
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUriTemp)
+
+            val chooser = Intent(Intent.ACTION_CHOOSER)
+            chooser.putExtra(Intent.EXTRA_TITLE, "Select from:")
+            chooser.putExtra(Intent.EXTRA_INTENT, galleryintent)
+            val intentArray = arrayOf(cameraIntent)
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            pickMedia.launch(chooser)
         }
         registerButton.setOnClickListener {
             auth.createUserWithEmailAndPassword(email.text.toString(), password.text.toString())
             .addOnCompleteListener(requireActivity()) { task ->
-                val taskovi = mutableListOf<Any>()
                 if (task.isSuccessful) {
                     if(imageUri!=null){
                         val firebaseImages = storage.child("images/${auth.currentUser?.uid}")
@@ -127,7 +155,7 @@ class RegisterFragment : Fragment() {
                                     photoUri = task.result
                                     displayName = username.text.toString()
                                 })?.addOnCompleteListener {
-                                    findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
+                                    user.user.value = auth.currentUser
                                 }
                             }
                         }
@@ -135,13 +163,15 @@ class RegisterFragment : Fragment() {
                         auth.currentUser?.updateProfile(userProfileChangeRequest {
                             displayName = username.text.toString()
                         })?.addOnCompleteListener {
-                            findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
+                            user.user.value = auth.currentUser
                         }
                     }
                 } else {
                     Log.w("TAG", "signInWithEmail:failure", task.exception)
                     Toast.makeText(this.context, "Dalje neces moci", Toast.LENGTH_LONG).show()
                 }
+                user.user.value = auth.currentUser
+                findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
             } }
     }
     override fun onDestroyView() {

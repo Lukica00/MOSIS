@@ -37,5 +37,12 @@
         <action
             android:id="@+id/action_mainFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_addObject"
+            app:destination="@id/addObject" />
     </fragment>
+    <fragment
+        android:id="@+id/addObject"
+        android:name="com.luka.mosis.AddObject"
+        tools:layout="@layout/fragment_add_object" />
 </navigation>

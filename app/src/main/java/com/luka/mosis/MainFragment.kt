@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,7 +13,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -36,7 +39,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
-    private val user : User by viewModels()
+    private val user : User by activityViewModels()
     lateinit var mapa : MapView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,23 +50,29 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
+
+        MenuCompat.setGroupDividerEnabled(binding.navView.menu,true)
+        binding.navView.setCheckedItem(R.id.explore)
+        binding.toolbar.setupWithNavController(findNavController(), AppBarConfiguration(setOf(R.id.mainFragment),binding.drawerLayout))
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.setupWithNavController(findNavController(), AppBarConfiguration(setOf(R.id.mainFragment),binding.drawerLayout))
-        binding.navView.inflateMenu(R.menu.menu_drawer)
-        binding.navView.inflateHeaderView(R.layout.menu_header)
-        binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_top).text = Firebase.auth.currentUser?.displayName
-        binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_bottom).text = Firebase.auth.currentUser?.email
-        binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.menu_header_image).load(Firebase.auth.currentUser?.photoUrl)
+
+        user.user.observe(viewLifecycleOwner) {
+            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_bottom).text =
+                it?.email
+            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_top).text = it?.displayName
+            binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.menu_header_image)
+                .load(it?.photoUrl)
+        }
         binding.navView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.logout_item -> {
                     Firebase.auth.signOut()
-                    user.user = Firebase.auth.currentUser
+                    user.user.value = Firebase.auth.currentUser
                     findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
                 }
                 else -> {
@@ -71,6 +80,22 @@ class MainFragment : Fragment() {
             }
             true
         }
+
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.filter -> {
+                    binding.drawerLayout.openDrawer(binding.navView2)
+                }
+                else -> {
+                }
+            }
+            true
+        }
+
+        binding.mainFab.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_addObject)
+        }
+
         val ctx: Context? = requireActivity().applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx!!))
         mapa = binding.mapa

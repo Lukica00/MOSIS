@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
@@ -25,7 +26,7 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var auth: FirebaseAuth
-    private val user: User by viewModels()
+    private val user: User by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -36,18 +37,15 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        Log.d("GA",binding.toString());
         return binding.root
     }
     override fun onStart() {
         super.onStart()
 
-        user.user = auth.currentUser
-        if (user.user != null) {
-            Log.d("GA","DEBIL")
+        user.user.value = auth.currentUser
+        if (user.user.value != null) {
             findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         }
-        Log.d("GA","govno")
         val loginButton = binding.loginButton
         loginButton.isEnabled = false
         val signupButton = binding.signupButton
@@ -71,7 +69,7 @@ class LoginFragment : Fragment() {
             auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
-                        Log.d("GA","KRETEN")
+                        user.user.value = auth.currentUser
                         findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
                     } else {
                         Log.w("TAG", "signInWithEmail:failure", task.exception)
@@ -83,12 +81,6 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
-/*    fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = inflater
-        inflater.inflate(R.menu.menu, menu)
-        return true
-    }*/
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

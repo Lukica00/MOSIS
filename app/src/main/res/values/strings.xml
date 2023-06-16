@@ -22,4 +22,8 @@
     <string name="login_email_edittext">Email</string>
     <string name="login_password">Password</string>
     <string name="logout_item">Izloguj se</string>
+    <string name="explore">Istraži</string>
+    <string name="leaderboard">Rang lista</string>
+    <string name="my_items">Moje stavke</string>
+    <string name="filter">Filter</string>
 </resources>
