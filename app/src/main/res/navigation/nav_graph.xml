@@ -44,5 +44,9 @@
     <fragment
         android:id="@+id/addObject"
         android:name="com.luka.mosis.AddObject"
-        tools:layout="@layout/fragment_add_object" />
+        tools:layout="@layout/fragment_add_object" >
+        <action
+            android:id="@+id/action_addObject_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
 </navigation>

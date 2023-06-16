@@ -25,6 +25,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
 import com.google.firebase.storage.FirebaseStorage
@@ -40,6 +42,7 @@ class RegisterFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db : FirebaseFirestore
     private lateinit var storage: StorageReference
     private val user: User by activityViewModels()
     private lateinit var pickMedia: ActivityResultLauncher<Intent>
@@ -48,6 +51,7 @@ class RegisterFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+        db = Firebase.firestore
         storage = FirebaseStorage.getInstance(Firebase.app).reference
     }
 
@@ -139,6 +143,8 @@ class RegisterFragment : Fragment() {
             auth.createUserWithEmailAndPassword(email.text.toString(), password.text.toString())
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
+                    user.setFirebaseUser(auth.currentUser)
+                    user.displayName.value = username.text.toString()
                     if(imageUri!=null){
                         val firebaseImages = storage.child("images/${auth.currentUser?.uid}")
                         firebaseImages.putFile(imageUri!!).continueWithTask { task ->
@@ -155,23 +161,40 @@ class RegisterFragment : Fragment() {
                                     photoUri = task.result
                                     displayName = username.text.toString()
                                 })?.addOnCompleteListener {
-                                    user.user.value = auth.currentUser
+                                    user.setFirebaseUser(auth.currentUser)
                                 }
+                                user.photoUri.value = task.result
+                                db.collection("users").document(user.userId.value!!).update("photoUri", task.result)
                             }
                         }
                     }else{
                         auth.currentUser?.updateProfile(userProfileChangeRequest {
                             displayName = username.text.toString()
                         })?.addOnCompleteListener {
-                            user.user.value = auth.currentUser
+                            user.setFirebaseUser(auth.currentUser)
                         }
                     }
+                    val posts : List<String> = List(0){""}
+                    val userDb = hashMapOf(
+                        "userId" to user.userId.value,
+                        "score" to 0,
+                        "posts" to posts,
+                        "displayName" to user.displayName.value,
+                        "photoUri" to ""
+                    )
+                    db.collection("users").document(user.userId.value!!).set(userDb)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d("Doc", "DocumentSnapshot added with ID: ${documentReference}")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("Doc", "Error adding document", e)
+                    }
+                    findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
+
                 } else {
                     Log.w("TAG", "signInWithEmail:failure", task.exception)
                     Toast.makeText(this.context, "Dalje neces moci", Toast.LENGTH_LONG).show()
                 }
-                user.user.value = auth.currentUser
-                findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
             } }
     }
     override fun onDestroyView() {

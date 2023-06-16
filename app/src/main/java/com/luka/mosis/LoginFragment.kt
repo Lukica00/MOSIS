@@ -42,8 +42,8 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        user.user.value = auth.currentUser
-        if (user.user.value != null) {
+        user.setFirebaseUser(auth.currentUser)
+        if (user.userId.value != null) {
             findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         }
         val loginButton = binding.loginButton
@@ -69,7 +69,7 @@ class LoginFragment : Fragment() {
             auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
-                        user.user.value = auth.currentUser
+                        user.setFirebaseUser(auth.currentUser)
                         findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
                     } else {
                         Log.w("TAG", "signInWithEmail:failure", task.exception)

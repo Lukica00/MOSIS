@@ -23,6 +23,8 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import coil.load
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.luka.mosis.databinding.FragmentMainBinding
 import org.osmdroid.config.Configuration
@@ -30,6 +32,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.Projection
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
@@ -40,6 +44,7 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private val user : User by activityViewModels()
+    private lateinit var db: FirebaseFirestore
     lateinit var mapa : MapView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +55,7 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-
+        db = Firebase.firestore
         MenuCompat.setGroupDividerEnabled(binding.navView.menu,true)
         binding.navView.setCheckedItem(R.id.explore)
         binding.toolbar.setupWithNavController(findNavController(), AppBarConfiguration(setOf(R.id.mainFragment),binding.drawerLayout))
@@ -60,19 +65,25 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        user.user.observe(viewLifecycleOwner) {
+        user.email.observe(viewLifecycleOwner){
+            Log.d("LOGOG eMail", it.toString())
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_bottom).text =
-                it?.email
-            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_top).text = it?.displayName
+                it
+        }
+        user.displayName.observe(viewLifecycleOwner){
+            Log.d("LOGOG dNAme", it.toString())
+            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_top).text = it
+        }
+        user.photoUri.observe(viewLifecycleOwner){
+            Log.d("LOGOG Uri", it.toString())
             binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.menu_header_image)
-                .load(it?.photoUrl)
+                .load(it)
         }
         binding.navView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.logout_item -> {
                     Firebase.auth.signOut()
-                    user.user.value = Firebase.auth.currentUser
+                    user.setFirebaseUser(Firebase.auth.currentUser)
                     findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
                 }
                 else -> {
@@ -95,7 +106,17 @@ class MainFragment : Fragment() {
         binding.mainFab.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_addObject)
         }
-
+        db.collection("posts").get().addOnSuccessListener {
+            for (document in it){
+                if(document.data["location"]!=null){
+                    val marker = Marker(mapa)
+                    val loc = document.data["location"] as com.google.firebase.firestore.GeoPoint
+                    marker.position = GeoPoint(loc.latitude, loc.longitude)
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    mapa.overlays.add(marker)
+                }
+            }
+        }
         val ctx: Context? = requireActivity().applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx!!))
         mapa = binding.mapa
