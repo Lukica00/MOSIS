@@ -51,7 +51,7 @@ android:fitsSystemWindows="true">
             android:focusable="true"
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
-            app:srcCompat="@drawable/outline_add_24"
+            app:srcCompat="@drawable/outline_add_location_alt_24"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -72,6 +72,60 @@ android:fitsSystemWindows="true">
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/filter_datum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_datum"/>
+            <CheckBox
+                android:id="@+id/filter_biljka"
+                android:text="@string/biljka"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+            <CheckBox
+                android:id="@+id/filter_zivotinja"
+                android:text="@string/zivotinja"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+            <CheckBox
+                android:id="@+id/filter_gljiva"
+                android:text="@string/gljiva"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+            <EditText
+                android:id="@+id/filter_ime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/filter_ime"/>
+            <com.google.android.material.slider.RangeSlider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/filter_tezina"
+                android:valueFrom="1"
+                android:valueTo="5"
+                android:stepSize="1"/>
+            <EditText
+                android:id="@+id/filter_radius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:text=""
+                />
+
+            <CheckBox
+                android:id="@+id/filter_moje"
+                android:text="@string/moje"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"/>
+        </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
 
 

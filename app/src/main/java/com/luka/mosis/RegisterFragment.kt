@@ -78,7 +78,6 @@ class RegisterFragment : Fragment() {
                     Log.d("PhotoPicker", "Otkazano")
                 }
             }
-
         }
         return binding.root
     }
@@ -146,7 +145,7 @@ class RegisterFragment : Fragment() {
                     user.setFirebaseUser(auth.currentUser)
                     user.displayName.value = username.text.toString()
                     if(imageUri!=null){
-                        val firebaseImages = storage.child("images/${auth.currentUser?.uid}")
+                        val firebaseImages = storage.child("images/profiles/${auth.currentUser?.uid}")
                         firebaseImages.putFile(imageUri!!).continueWithTask { task ->
                             if (task.isSuccessful) {
                                 firebaseImages.downloadUrl

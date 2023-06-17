@@ -27,4 +27,16 @@
     <string name="my_items">Moje stavke</string>
     <string name="filter">Filter</string>
     <string name="dodaj_objekat">Dodaj objekat</string>
+    <string name="add_name">Naziv</string>
+    <string name="add_latin_name">Latinski naziv</string>
+    <string name="add_opis">Opis objekta</string>
+    <string name="add_tezina">Kako doći</string>
+    <string name="biljka">Biljka</string>
+    <string name="gljiva">Gljiva</string>
+    <string name="zivotinja">Životinja</string>
+    <string name="filter_ime">Pretraga po imenu</string>
+    <string name="filter_od">Od</string>
+    <string name="filter_do">Do</string>
+    <string name="filter_datum">Odaberi datum kreiranja</string>
+    <string name="moje">Samo moji objekti</string>
 </resources>
