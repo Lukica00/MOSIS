@@ -62,48 +62,73 @@ android:fitsSystemWindows="true">
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         app:headerLayout="@layout/menu_header"
-        app:menu="@menu/menu_drawer">
+        app:menu="@menu/menu_drawer"
+        android:fitsSystemWindows="false">
     </com.google.android.material.navigation.NavigationView>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="false"
+        android:padding="28dp">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <Button
-                android:id="@+id/filter_datum"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/filter_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="false"
+                app:selectionRequired="true"
+                >
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/filter_biljka"
+                    app:icon="@drawable/outline_yard_24"
+                    android:text="@string/biljka"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/filter_zivotinja"
+                    app:icon="@drawable/outline_pets_24"
+                    android:text="@string/zivotinja"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:id="@+id/filter_gljiva"
+                    app:icon="@drawable/mushroom_outline"
+                    android:text="@string/gljiva"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/filter_datum"/>
-            <CheckBox
-                android:id="@+id/filter_biljka"
-                android:text="@string/biljka"
+                android:hint="@string/filter_ime"
+                app:endIconMode="clear_text">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/filter_ime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"/>
-            <CheckBox
-                android:id="@+id/filter_zivotinja"
-                android:text="@string/zivotinja"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
-            <CheckBox
-                android:id="@+id/filter_gljiva"
-                android:text="@string/gljiva"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
-            <EditText
-                android:id="@+id/filter_ime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/filter_ime"/>
+                android:labelFor="@+id/filter_tezina"
+                android:text="@string/filter_tezina"/>
             <com.google.android.material.slider.RangeSlider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -111,21 +136,33 @@ android:fitsSystemWindows="true">
                 android:valueFrom="1"
                 android:valueTo="5"
                 android:stepSize="1"/>
-            <EditText
-                android:id="@+id/filter_radius"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:text=""
-                />
-
-            <CheckBox
+                android:hint="@string/filter_radius"
+                app:endIconMode="clear_text"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/filter_radius"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text=""
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/filter_datum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_datum"/>
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/filter_moje"
                 android:text="@string/moje"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="false"/>
         </LinearLayout>
+        </ScrollView>
     </com.google.android.material.navigation.NavigationView>
 
 

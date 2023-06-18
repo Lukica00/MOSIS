@@ -39,4 +39,6 @@
     <string name="filter_do">Do</string>
     <string name="filter_datum">Odaberi datum kreiranja</string>
     <string name="moje">Samo moji objekti</string>
+    <string name="filter_radius">Radius u km</string>
+    <string name="filter_tezina">Tezina dolaska</string>
 </resources>

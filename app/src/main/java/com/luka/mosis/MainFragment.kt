@@ -75,6 +75,9 @@ class MainFragment : Fragment() {
         binding.navView.setCheckedItem(R.id.explore)
         binding.toolbar.setupWithNavController(findNavController(), AppBarConfiguration(setOf(R.id.mainFragment),binding.drawerLayout))
         binding.filterTezina.setValues(1.0f,5.0f)
+        binding.filterToggle.check(R.id.filter_biljka)
+        binding.filterToggle.check(R.id.filter_zivotinja)
+        binding.filterToggle.check(R.id.filter_gljiva)
         return binding.root
     }
     fun slusacFiltera(){
@@ -151,9 +154,7 @@ class MainFragment : Fragment() {
         picker!!.addOnPositiveButtonClickListener{
             slusacFiltera()
         }
-        binding.filterBiljka.setOnCheckedChangeListener { _, _ -> slusacFiltera() }
-        binding.filterZivotinja.setOnCheckedChangeListener { _, _ -> slusacFiltera() }
-        binding.filterGljiva.setOnCheckedChangeListener { _, _ -> slusacFiltera() }
+        binding.filterToggle.addOnButtonCheckedListener{ _, _, _ -> slusacFiltera() }
         binding.filterIme.doOnTextChanged { _, _, _, _ ->  slusacFiltera()}
         binding.filterTezina.addOnChangeListener { _, _, _ ->  slusacFiltera()}
         binding.filterRadius.doOnTextChanged { _, _, _, _->  slusacFiltera()}
