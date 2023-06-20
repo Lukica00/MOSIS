@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="12dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical|left"
+        app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+        android:src="@drawable/outline_hourglass_top_24"
+        android:layout_weight="0"/>
+    <TextView
+        android:id="@+id/firstLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|left"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:textSize="20sp"
+        android:paddingLeft="12dp"
+        android:layout_weight="1"/>
+    <TextView
+        android:id="@+id/secondLine"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="viewEnd"
+        android:layout_gravity="center_vertical|end"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:textSize="20sp"
+        android:layout_weight="0" />
+    <TextView
+        android:id="@+id/position"
+        android:textStyle="bold"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="viewEnd"
+        android:layout_gravity="center_vertical|end"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:textSize="20sp"
+        android:layout_weight="0" />
+
+</LinearLayout>

@@ -162,16 +162,13 @@ class MainFragment : Fragment() {
 
 
         user.email.observe(viewLifecycleOwner){
-            Log.d("LOGOG eMail", it.toString())
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_bottom).text =
                 it
         }
         user.displayName.observe(viewLifecycleOwner){
-            Log.d("LOGOG dNAme", it.toString())
             binding.navView.getHeaderView(0).findViewById<TextView>(R.id.menu_header_top).text = it
         }
         user.photoUri.observe(viewLifecycleOwner){
-            Log.d("LOGOG Uri", it.toString())
             binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.menu_header_image)
                 .load(it)
         }
@@ -181,6 +178,9 @@ class MainFragment : Fragment() {
                     Firebase.auth.signOut()
                     user.setFirebaseUser(Firebase.auth.currentUser)
                     findNavController().navigate(R.id.action_mainFragment_to_loginFragment)
+                }
+                R.id.leaderboard -> {
+                    findNavController().navigate(R.id.action_mainFragment_to_leaderboardFragment)
                 }
                 else -> {
                 }
@@ -226,7 +226,7 @@ class MainFragment : Fragment() {
                                 fav = user.posts.value?.contains(document.reference.id)
                                 Log.d("TAGG", user.posts.value?.size.toString())
                                 (document.data!!["owner"] as DocumentReference).get().addOnSuccessListener {
-                                    marker?.infoWindow?.view?.findViewById<TextView>(R.id.bubble_author)?.text = getString(R.string.bubble_author,it.data!!["displayName"] as String)
+                                    marker.infoWindow?.view?.findViewById<TextView>(R.id.bubble_author)?.text = getString(R.string.bubble_author,it.data!!["displayName"] as String)
                                 }
                                 val button = mView.findViewById<Button>(R.id.bubble_moreinfo)
                                 if(fav == true){
@@ -261,11 +261,11 @@ class MainFragment : Fragment() {
                                     if(document.data!!["imageUri"] as String == ""){
                                         db.collection("posts").document(document.reference.id).get().addOnSuccessListener {
                                             document.data!!["imageUri"] = it.data!!["imageUri"]
-                                            marker?.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(it.data!!["imageUri"] as String))
+                                            marker.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(it.data!!["imageUri"] as String))
                                         }
                                     }
                                     else
-                                        marker?.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(document.data!!["imageUri"] as String))
+                                        marker.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(document.data!!["imageUri"] as String))
                                 }
                             }
                         }

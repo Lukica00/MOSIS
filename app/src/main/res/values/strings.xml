@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MOSIS</string>
+    <string name="app_name">Mosis Priroda</string>
     <string name="login_button">Uloguj se</string>
     <string name="signup_button">Registruj se</string>
     <string name="register_button">Registruj se</string>
@@ -43,4 +43,5 @@
     <string name="bubble_dolazak_kratak">Dolazak: %1$s</string>
     <string name="bubble_dolazak">Dolazak: %1$s - %2$s.</string>
     <string name="omiljeno">Samo omiljeni objekti</string>
+    <string name="lead_title">Rang lista</string>
 </resources>

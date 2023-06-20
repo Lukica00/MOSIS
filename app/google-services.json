@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1005433094633",
+    "project_id": "mosis-320e9",
+    "storage_bucket": "mosis-320e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005433094633:android:5abd929962cfa24a250b78",
+        "android_client_info": {
+          "package_name": "com.luka.mosis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1005433094633-4p8pkbq6eep0rjdijqdqj74pf2f5n3h7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1JfYzv_PIJlAfP2u7E4pcx4F8wRoQMnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1005433094633-4p8pkbq6eep0rjdijqdqj74pf2f5n3h7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
