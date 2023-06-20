@@ -10,71 +10,135 @@
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/linear"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:title="Dodaj objekat"
+            app:title="@string/add_object_title"
             />
     </com.google.android.material.appbar.AppBarLayout>
+    <ScrollView
+        android:id="@+id/adD_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true"
+        android:paddingLeft="28dp"
+        android:paddingRight="28dp"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
     <LinearLayout
         android:id="@+id/linear"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/appbar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-        <EditText
-            android:id="@+id/add_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/appbar"
-            app:layout_constraintBottom_toTopOf="@id/add_latin_name"
-            android:hint="@string/add_name"/>
-        <EditText
-            android:id="@+id/add_latin_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/add_latin_name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:hint="@string/add_latin_name"/>
-        <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/add_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_launcher_background"
+            android:layout_gravity="center"
+            app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+            android:src="@drawable/outline_add_a_photo_24"
+            android:layout_margin="4dp"
             />
-        <EditText
-            android:id="@+id/add_opis"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/add_latin_name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:hint="@string/add_opis"/>
-        <EditText
-            android:id="@+id/add_tezina"
+            android:hint="@string/add_name"
+            app:endIconMode="clear_text"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/add_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/add_latin_name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:hint="@string/add_tezina"/>
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/add_tezina_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/add_tip_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
+            android:hint="@string/add_latin_name"
+            app:endIconMode="clear_text"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/add_latin_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_opis"
+            app:endIconMode="clear_text"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/add_opis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_tezina"
+            app:endIconMode="clear_text"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/add_tezina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_tezina_spinner"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/add_tezina_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="none"
+                app:simpleItems="@array/tezina_spinner"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_tip_spinner"
+            android:layout_margin="4dp"
+            >
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/add_tip_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="none"
+                app:simpleItems="@array/tip_spinner"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/dodaj_objekat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dodaj_objekat"/>
+            android:text="@string/dodaj_objekat"
+            android:layout_margin="4dp"/>
     </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

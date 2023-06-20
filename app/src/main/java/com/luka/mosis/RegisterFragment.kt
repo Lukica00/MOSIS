@@ -92,10 +92,10 @@ class RegisterFragment : Fragment() {
         val repeatPassword = binding.registerRepeatPasswordEdittext
         var validPassword = false
         if(!repeatPassword.text.isNullOrEmpty())
-            validPassword = repeatPassword.text.length > 5 && repeatPassword.text.contentEquals(password.text)
+            validPassword = repeatPassword.text!!.length > 5 && repeatPassword.text!!.contentEquals(password.text)
         val username = binding.registerUsernameEdittext
         val phone = binding.registerPhoneEdittext
-        var validPhone = Patterns.PHONE.matcher(phone.text).matches()
+        var validPhone = Patterns.PHONE.matcher(phone.text.toString()).matches()
         val image = binding.registerImage
         email.doOnTextChanged { text, _, _, _ ->
             validEmail = !TextUtils.isEmpty(text) && Patterns.EMAIL_ADDRESS.matcher(text!!).matches()
@@ -173,7 +173,7 @@ class RegisterFragment : Fragment() {
                             user.setFirebaseUser(auth.currentUser)
                         }
                     }
-                    val posts : List<String> = List(0){""}
+                    val posts : ArrayList<String> = ArrayList()
                     val userDb = hashMapOf(
                         "userId" to user.userId.value,
                         "score" to 0,

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="tezina_spinner">
+        <item>
+            Vrlo lako
+        </item>
+        <item>
+            Lako
+        </item>
+        <item>
+            Osrednje
+        </item>
+        <item>
+            Teško
+        </item>
+        <item>
+            Jako teško
+        </item>
+    </array> <array name="tip_spinner">
+    <item>
+        Biljka
+    </item>
+    <item>
+        Životinja
+    </item>
+    <item>
+        Gljiva
+    </item>
+</array>
+</resources>

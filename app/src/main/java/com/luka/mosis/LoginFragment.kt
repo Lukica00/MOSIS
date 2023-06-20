@@ -5,18 +5,17 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.luka.mosis.databinding.FragmentLoginBinding
 
@@ -27,6 +26,7 @@ class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private val user: User by activityViewModels()
+    private lateinit var db: FirebaseFirestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -44,6 +44,14 @@ class LoginFragment : Fragment() {
 
         user.setFirebaseUser(auth.currentUser)
         if (user.userId.value != null) {
+            db = Firebase.firestore
+            db.collection("users").document(user.userId.value!!).get().addOnSuccessListener {
+                user.posts.value = it.data!!["posts"] as ArrayList<String?>
+                user.score.value = it.data!!["score"] as Long
+            }
+            if(user.posts.value == null){
+                user.posts.value = ArrayList<String?>()
+            }
             findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
         }
         val loginButton = binding.loginButton
@@ -70,6 +78,14 @@ class LoginFragment : Fragment() {
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
                         user.setFirebaseUser(auth.currentUser)
+                        db = Firebase.firestore
+                        db.collection("users").document(user.userId.value!!).get().addOnSuccessListener {
+                            user.posts.value = it.data!!["posts"] as ArrayList<String?>
+                            user.score.value = it.data!!["score"] as Long
+                        }
+                        if(user.posts.value == null){
+                            user.posts.value = ArrayList<String?>()
+                        }
                         findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
                     } else {
                         Log.w("TAG", "signInWithEmail:failure", task.exception)

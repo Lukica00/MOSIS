@@ -23,7 +23,10 @@ android:fitsSystemWindows="true">
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:title="Cvecara Mosis"
+                app:titleCentered="true"
+                app:subtitleCentered="true"
+                app:title="@string/main_title"
+                app:subtitle="@string/main_subtitle"
                 app:menu="@menu/menu_main"
                 />
         </com.google.android.material.appbar.AppBarLayout>
@@ -72,21 +75,71 @@ android:fitsSystemWindows="true">
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="false"
-        android:padding="28dp">
+        android:padding="12dp">
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="fill_vertical"
             android:orientation="vertical">
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/filter_radius"
+                app:endIconMode="clear_text"
+                android:layout_margin="4dp"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/filter_radius"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text=""
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/filter_ime"
+                app:endIconMode="clear_text"
+                android:layout_margin="4dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/filter_ime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/filter_tezina"
+                android:text="@string/filter_tezina"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="0dp"/>
+
+            <com.google.android.material.slider.RangeSlider
+                android:id="@+id/filter_tezina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginBottom="4dp"
+                android:stepSize="1"
+                android:valueFrom="0"
+                android:valueTo="4" />
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/filter_toggle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:singleSelection="false"
                 app:selectionRequired="true"
+                android:layout_margin="4dp"
                 >
                 <com.google.android.material.button.MaterialButton
                     style="?attr/materialButtonOutlinedStyle"
@@ -113,54 +166,27 @@ android:fitsSystemWindows="true">
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
             </com.google.android.material.button.MaterialButtonToggleGroup>
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/filter_ime"
-                app:endIconMode="clear_text">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/filter_ime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:labelFor="@+id/filter_tezina"
-                android:text="@string/filter_tezina"/>
-            <com.google.android.material.slider.RangeSlider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/filter_tezina"
-                android:valueFrom="1"
-                android:valueTo="5"
-                android:stepSize="1"/>
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/filter_radius"
-                app:endIconMode="clear_text"
-                >
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/filter_radius"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:text=""
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TonalButton"
                 android:id="@+id/filter_datum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/filter_datum"/>
+                android:text="@string/filter_datum"
+                android:layout_margin="4dp"/>
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/filter_moje"
                 android:text="@string/moje"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="false"/>
+                android:checked="false"
+                android:layout_margin="4dp"/>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/filter_omiljeno"
+                android:text="@string/omiljeno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:layout_margin="4dp"/>
         </LinearLayout>
         </ScrollView>
     </com.google.android.material.navigation.NavigationView>

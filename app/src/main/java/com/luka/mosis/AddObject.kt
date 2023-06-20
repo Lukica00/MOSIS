@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +24,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
@@ -62,17 +62,10 @@ class AddObject : Fragment() {
         setButtonEnabled()
         storage = FirebaseStorage.getInstance(Firebase.app).reference
 
-        val tezine = arrayOf("Vrlo lako", "Lako", "Osrednje", "Teže", "Baš teško")
-        val adapter1 = ArrayAdapter(requireContext(),
-            android.R.layout.simple_spinner_item,tezine)
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.addTezinaSpinner.adapter = adapter1
+        (binding.addTezinaSpinner as? MaterialAutoCompleteTextView)?.setText(resources.getStringArray(R.array.tezina_spinner)[0], false)
+        (binding.addTipSpinner as? MaterialAutoCompleteTextView)?.setText(resources.getStringArray(R.array.tip_spinner)[0], false)
 
-        val tipovi = arrayOf("Biljka", "Životinja", "Gljiva")
-        val adapter2 = ArrayAdapter(requireContext(),
-            android.R.layout.simple_spinner_item,tipovi)
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.addTipSpinner.adapter = adapter2
+
 
         pickMedia = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             when (result.resultCode) {
@@ -161,6 +154,40 @@ class AddObject : Fragment() {
                     db.collection("posts").document(postId).update("imageUri", task.result)
                 }
             }
+            val diffNum = when (binding.addTezinaSpinner.text.toString()){
+                resources.getStringArray(R.array.tezina_spinner)[0]->{
+                    0
+                }
+                resources.getStringArray(R.array.tezina_spinner)[1]->{
+                    1
+                }
+                resources.getStringArray(R.array.tezina_spinner)[2]->{
+                    2
+                }
+                resources.getStringArray(R.array.tezina_spinner)[3]->{
+                    3
+                }
+                resources.getStringArray(R.array.tezina_spinner)[4]->{
+                    4
+                }
+                else ->{
+                    0
+                }
+            }
+            val type = when (binding.addTipSpinner.text.toString()){
+                resources.getStringArray(R.array.tip_spinner)[0]->{
+                    0
+                }
+                resources.getStringArray(R.array.tip_spinner)[1]->{
+                    1
+                }
+                resources.getStringArray(R.array.tip_spinner)[2]->{
+                    2
+                }
+                else ->{
+                    0
+                }
+            }
             val userDb = hashMapOf(
                 "location" to GeoPoint(location.value!!.latitude,location.value!!.longitude),
                 "type" to 0,
@@ -168,14 +195,17 @@ class AddObject : Fragment() {
                 "latinName" to binding.addLatinName.text.toString(),
                 "desc" to binding.addOpis.text.toString(),
                 "diff" to binding.addTezina.text.toString(),
-                "diffNum" to binding.addTezinaSpinner.selectedItemPosition,
-                "type" to binding.addTipSpinner.selectedItemPosition,
+                "diffNum" to diffNum,
+                "type" to type,
                 "imageUri" to "",
                 "owner" to db.collection("users").document(user.userId.value!!),
                 "datum" to Calendar.getInstance().time
             )
             db.collection("posts").document(postId).set(userDb).addOnSuccessListener {
                 findNavController().navigate(R.id.action_addObject_to_mainFragment)
+                db.collection("users").document(user.userId.value!!).get().addOnSuccessListener {
+                    db.collection("users").document(user.userId.value!!).update("score", (it.data!!["score"] as Long) + 4L)
+                }
             }
 
         }

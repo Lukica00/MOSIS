@@ -3,7 +3,7 @@ package com.luka.mosis
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
+import android.icu.text.SimpleDateFormat
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -12,7 +12,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,9 +26,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import coil.ImageLoader
 import coil.load
-import coil.request.ImageRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Timestamp
@@ -43,12 +41,15 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.Projection
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.infowindow.InfoWindow.closeAllInfoWindowsOn
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 
 class MainFragment : Fragment() {
@@ -74,13 +75,14 @@ class MainFragment : Fragment() {
         mapa = binding.mapa
         binding.navView.setCheckedItem(R.id.explore)
         binding.toolbar.setupWithNavController(findNavController(), AppBarConfiguration(setOf(R.id.mainFragment),binding.drawerLayout))
-        binding.filterTezina.setValues(1.0f,5.0f)
+        binding.filterTezina.setValues(0.0f,4.0f)
         binding.filterToggle.check(R.id.filter_biljka)
         binding.filterToggle.check(R.id.filter_zivotinja)
         binding.filterToggle.check(R.id.filter_gljiva)
         return binding.root
     }
     fun slusacFiltera(){
+        closeAllInfoWindowsOn(mapa)
         if(markeri!=null){
             val startDate = Date((picker!!.selection as androidx.core.util.Pair<Long,Long>).first)
             val endDate = Date((picker!!.selection as androidx.core.util.Pair<Long,Long>).second)
@@ -90,6 +92,7 @@ class MainFragment : Fragment() {
             val imeBox = binding.filterIme.text
             val tezRange = binding.filterTezina.values
             val moje = binding.filterMoje.isChecked
+            val omiljeno = binding.filterOmiljeno.isChecked
             val radiusRange = binding.filterRadius.text.toString().toFloatOrNull()
             for (marker in markeri!!){
                 if(marker!=null){
@@ -115,6 +118,10 @@ class MainFragment : Fragment() {
                     if(moje){
                         isMoj = (marker.document!!.data!!["owner"] as DocumentReference).id.contains(user.userId.value!!)
                     }
+                    var isOmiljen = true
+                    if(omiljeno){
+                        isOmiljen = user.posts.value!!.contains(marker.document!!.id)
+                    }
 
                     var razdaljinaOk = true
                     if (location!=null && radiusRange!=null){
@@ -127,16 +134,8 @@ class MainFragment : Fragment() {
                             dist
                         )
                         razdaljinaOk = dist[0]/1000<=radiusRange
-                        Log.d("TEST1", dist[0].toString())
-                        Log.d("TEST2", radiusRange.toString())
                     }
-                    Log.d("TEST0", vremeOk.toString())
-                    Log.d("TEST3", tipOk.toString())
-                    Log.d("TEST4", imeOk.toString())
-                    Log.d("TEST5", tezOk.toString())
-                    Log.d("TEST6", isMoj.toString())
-                    Log.d("TEST7", razdaljinaOk.toString())
-                    marker.isEnabled = vremeOk && tipOk && imeOk && tezOk && isMoj && razdaljinaOk
+                    marker.isEnabled = vremeOk && tipOk && imeOk && tezOk && isMoj && razdaljinaOk && isOmiljen
                 }
             }
         }
@@ -159,6 +158,7 @@ class MainFragment : Fragment() {
         binding.filterTezina.addOnChangeListener { _, _, _ ->  slusacFiltera()}
         binding.filterRadius.doOnTextChanged { _, _, _, _->  slusacFiltera()}
         binding.filterMoje.setOnCheckedChangeListener { _, _ -> slusacFiltera() }
+        binding.filterOmiljeno.setOnCheckedChangeListener { _, _ -> slusacFiltera() }
 
 
         user.email.observe(viewLifecycleOwner){
@@ -214,8 +214,66 @@ class MainFragment : Fragment() {
                         val loc = document.data!!["location"] as com.google.firebase.firestore.GeoPoint
                         marker.position = GeoPoint(loc.latitude, loc.longitude)
                         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        marker.title = "Naziv: ${document.data!!["name"] as String}"
-                        marker.subDescription = "Latinski naziv: ${document.data!!["latinName"] as String}"
+                        marker.title = document.data!!["name"] as String
+                        marker.snippet = document.data!!["latinName"] as String
+                        val opis = document.data!!["desc"] as String
+                        if(opis != "")
+                            marker.subDescription = getString(R.string.bubble_opis, document.data!!["desc"] as String)
+                        marker.infoWindow = object: MarkerInfoWindow(R.layout.marker_bubble,mapa){
+                            var prvi = true
+                            var fav: Boolean?
+                            init {
+                                fav = user.posts.value?.contains(document.reference.id)
+                                Log.d("TAGG", user.posts.value?.size.toString())
+                                (document.data!!["owner"] as DocumentReference).get().addOnSuccessListener {
+                                    marker?.infoWindow?.view?.findViewById<TextView>(R.id.bubble_author)?.text = getString(R.string.bubble_author,it.data!!["displayName"] as String)
+                                }
+                                val button = mView.findViewById<Button>(R.id.bubble_moreinfo)
+                                if(fav == true){
+                                    button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_24, 0, 0, 0)
+                                }else{
+                                    button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_24, 0, 0, 0)
+                                }
+                                button.setOnClickListener {
+                                    fav = !fav!!
+                                    val ref = document.data!!["owner"] as DocumentReference
+                                    if(fav==true){
+                                        user.posts.value!!.add(document.id)
+                                        db.collection("users").document(ref.id).get().addOnSuccessListener {
+                                            db.collection("users").document(ref.id).update("score", (it.data!!["score"] as Long) + 1L)
+                                        }
+                                        button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_24, 0, 0, 0)
+                                    }else{
+                                        user.posts.value!!.remove(document.id)
+                                        db.collection("users").document(ref.id).get().addOnSuccessListener {
+                                            db.collection("users").document(ref.id).update("score", (it.data!!["score"] as Long) - 1L)
+                                        }
+                                        button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_24, 0, 0, 0)
+                                    }
+                                    db.collection("users").document(user.userId.value!!).update("posts",user.posts.value!!)
+                                }
+                            }
+                            override fun onOpen(item: Any?) {
+                                closeAllInfoWindowsOn(mapa)
+                                super.onOpen(item)
+                                if(prvi){
+                                    prvi = false
+                                    if(document.data!!["imageUri"] as String == ""){
+                                        db.collection("posts").document(document.reference.id).get().addOnSuccessListener {
+                                            document.data!!["imageUri"] = it.data!!["imageUri"]
+                                            marker?.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(it.data!!["imageUri"] as String))
+                                        }
+                                    }
+                                    else
+                                        marker?.infoWindow?.view?.findViewById<ImageView>(R.id.bubble_image_moj)?.load(Uri.parse(document.data!!["imageUri"] as String))
+                                }
+                            }
+                        }
+                        val tezinaNum = resources.getStringArray(R.array.tezina_spinner)[(document.data!!["diffNum"] as Long).toInt()]
+                        val tezina = document.data!!["diff"] as String
+                        if(tezina == "") marker.infoWindow.view.findViewById<TextView>(R.id.bubble_tezina).text = getString(R.string.bubble_dolazak_kratak, tezinaNum)
+                            else marker.infoWindow.view.findViewById<TextView>(R.id.bubble_tezina).text = getString(R.string.bubble_dolazak, tezinaNum, document.data!!["diff"] as String)
+                        marker.infoWindow.view.findViewById<TextView>(R.id.bubble_datum).text = getString(R.string.bubble_datum, SimpleDateFormat("dd. MM. yyyy.", Locale.getDefault()).format((document.data!!["datum"] as Timestamp).toDate()))
                         when(document.data!!["type"] as Long){
                             0L ->{
                                 marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.outline_yard_24, null)
@@ -229,15 +287,6 @@ class MainFragment : Fragment() {
                             else -> {
                             }
                         }
-                        val loader = ImageLoader(requireContext())
-                        val req = ImageRequest.Builder(requireContext())
-                            .data(Uri.parse(document.data!!["imageUri"] as String))
-                            .target { result ->
-                                marker.image = result as BitmapDrawable
-                            }
-                            .build()
-                        loader.enqueue(req)
-
                         mapa.overlays.add(marker)
                         marker
                     }
@@ -266,7 +315,6 @@ class MainFragment : Fragment() {
         }
         mapa.controller.setZoom(15.0)
         mapa.controller.setCenter(GeoPoint(43.3209, 21.8958))
-        //mapa.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
         val rotacijaOverlay = RotationGestureOverlay(mapa)
         rotacijaOverlay.isEnabled = true
@@ -281,6 +329,8 @@ class MainFragment : Fragment() {
                 return true
             }
         }
+        val scaleBar = ScaleBarOverlay(mapa)
+        mapa.overlays.add(scaleBar)
         compassOverlay.enableCompass()
         mapa.overlays.add(compassOverlay)
     }
